@@ -65,6 +65,7 @@ jobs:
           -v ${{ github.workspace }}/security_reports:/output \
           -v /var/run/docker.sock:/var/run/docker.sock \
           --network $NETWORK_NAME \
+          --privileged \
           -e GITHUB_WORKSPACE=/workspace \
           -e CONTAINER_NAME=$TARGET_CONTAINER \
           -e TARGET_ENDPOINT="http://$TARGET_CONTAINER:80" \
