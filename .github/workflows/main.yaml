@@ -70,7 +70,7 @@ jobs:
           -v /var/run/docker.sock:/var/run/docker.sock \
           --network $NETWORK_NAME \
           --privileged \
-          --name $SUITE_CONTAINER_NAME
+          --name $SUITE_CONTAINER_NAME \
           -e CODE_DIR=/target_code \
           -e TARGET_IMAGE=$TARGET_IMAGE \
           -e TARGET_ENDPOINT="https://dasmlab.org" \
