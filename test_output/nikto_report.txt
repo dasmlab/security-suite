@@ -1,0 +1,14 @@
+- Nikto v2.1.5/2.1.5
++ Target Host: localhost
++ Target Port: 8888
++ GET /: Server leaks inodes via ETags, header found with file /, fields: 0x2d 0x432a5e4a73a80 
++ GET /: The anti-clickjacking X-Frame-Options header is not present.
++ OPTIONS /: Allowed HTTP Methods: GET, POST, OPTIONS, HEAD, TRACE 
++ -877: TRACE /: HTTP TRACE method is active, suggesting the host is vulnerable to XST
+- Nikto v2.1.5/2.1.5
++ Target Host: localhost
++ Target Port: 8888
++ GET /: Server leaks inodes via ETags, header found with file /, fields: 0x2d 0x432a5e4a73a80 
++ GET /: The anti-clickjacking X-Frame-Options header is not present.
++ OPTIONS /: Allowed HTTP Methods: HEAD, GET, POST, OPTIONS, TRACE 
++ -877: TRACE /: HTTP TRACE method is active, suggesting the host is vulnerable to XST

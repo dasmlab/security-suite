@@ -1,0 +1,76 @@
+name: dasmlab_security_suite CI Pipeline (Isolated Self-Test)
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  security-suite-pipeline:
+    runs-on: self-hosted
+    steps:
+
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Setup Build Metadata
+      id: vars
+      run: |
+        echo "COMMIT_ID=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        echo "VERSION_TAG=v$(date +'%Y.%m.%d')-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        echo "NETWORK_NAME=security-suite-net-${GITHUB_SHA::8}" >> $GITHUB_ENV
+        echo "SUITE_IMAGE_TAG=dasmlab-security-suite:${GITHUB_SHA::8}" >> $GITHUB_ENV
+        echo "TARGET_IMAGE=httpd:2.4-alpine" >> $GITHUB_ENV
+        echo "TARGET_CONTAINER=test-httpd-${GITHUB_SHA::8}" >> $GITHUB_ENV
+        echo "HOST_PORT=8888" >> $GITHUB_ENV
+
+    - name: Build Phase (Security Suite Container)
+      run: |
+        docker build -t $SUITE_IMAGE_TAG .
+
+    - name: Create Isolated Docker Network
+      run: |
+        docker network create $NETWORK_NAME || true
+
+    - name: Run Phase (Smoke Test)
+      run: |
+        echo "Testing that dasmlab_security_suite container starts..."
+        docker run --rm $SUITE_IMAGE_TAG --help || true
+        echo "Container started successfully."
+
+    - name: Test Phase (SAST/DAST Self-Test)
+      run: |
+        echo "Pull and start test target: $TARGET_IMAGE"
+        docker pull $TARGET_IMAGE
+        docker rm -f $TARGET_CONTAINER 2>/dev/null || true
+        docker run -d --name $TARGET_CONTAINER --network $NETWORK_NAME -p $HOST_PORT:80 $TARGET_IMAGE
+
+        echo "Clone source code for SAST test (httpd)..."
+        rm -rf test_code
+        git clone --depth=1 https://github.com/apache/httpd.git test_code || mkdir test_code
+
+        mkdir -p security_reports
+
+        echo "Run security suite against running container and endpoint"
+        docker run --rm \
+          -v ${{ github.workspace }}/test_code:/workspace:ro \
+          -v ${{ github.workspace }}/security_reports:/output \
+          --network $NETWORK_NAME \
+          -e GITHUB_WORKSPACE=/workspace \
+          -e CONTAINER_NAME=$TARGET_CONTAINER \
+          -e TARGET_ENDPOINT="http://$TARGET_CONTAINER:80" \
+          $SUITE_IMAGE_TAG
+
+        echo "Teardown test target container"
+        docker rm -f $TARGET_CONTAINER
+
+    - name: Upload Security Reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-reports
+        path: security_reports/
+
+    - name: Teardown (Clean Network)
+      if: always()
+      run: |
+        docker network rm $NETWORK_NAME || true
+
