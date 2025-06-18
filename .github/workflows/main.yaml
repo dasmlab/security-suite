@@ -22,6 +22,7 @@ jobs:
         echo "TARGET_IMAGE=httpd:2.4-alpine" >> $GITHUB_ENV
         echo "TARGET_CONTAINER=test-httpd-${GITHUB_SHA::8}" >> $GITHUB_ENV
         echo "HOST_PORT=8888" >> $GITHUB_ENV
+        echo "SAST_REPO=https://github.com/lmcdasm/dasmlab-home" >> $GITHUB_ENV
 
     - name: Print Pipeline Context
       run: |
@@ -29,8 +30,8 @@ jobs:
         echo "Tag: $VERSION_TAG"
         echo "Network: $NETWORK_NAME"
         echo "Suite Image: $SUITE_IMAGE_TAG"
-        echo "Target: $TARGET_IMAGE"
-
+        echo "Target Image: $TARGET_IMAGE"
+        echo "SAST Repo: $SAST_REPO"
 
     - name: Build Phase (Security Suite Container)
       run: |
@@ -53,26 +54,26 @@ jobs:
         docker rm -f $TARGET_CONTAINER 2>/dev/null || true
         docker run -d --name $TARGET_CONTAINER --network $NETWORK_NAME -p $HOST_PORT:80 $TARGET_IMAGE
 
-        echo "Clone source code for SAST test (httpd)..."
-        rm -rf test_code
-        git clone --depth=1 https://github.com/apache/httpd.git test_code || mkdir test_code
+        echo "Clone static test target repo for SAST scan..."
+        rm -rf target_code
+        git clone --depth=1 "$SAST_REPO" target_code
 
         mkdir -p security_reports
 
-        echo "Run security suite against running container and endpoint"
+        echo "Run security suite against test target code and web endpoint"
         docker run --rm \
-          -v ${{ github.workspace }}/test_code:/workspace:ro \
+          -v ${{ github.workspace }}/target_code:/target_code:ro \
           -v ${{ github.workspace }}/security_reports:/output \
           -v /var/run/docker.sock:/var/run/docker.sock \
           --network $NETWORK_NAME \
           --privileged \
-          -e GITHUB_WORKSPACE=/workspace \
-          -e CONTAINER_NAME=$TARGET_CONTAINER \
-          -e TARGET_ENDPOINT="http://$TARGET_CONTAINER:80" \
+          -e CODE_DIR=/target_code \
+          -e TARGET_IMAGE=$TARGET_IMAGE \
+          -e TARGET_ENDPOINT="https://dasmlab.org" \
           $SUITE_IMAGE_TAG
 
         echo "Teardown test target container"
-        docker rm -f $TARGET_CONTAINER
+        docker rm -f $TARGET_CONTAINER 2>/dev/null || true
 
     - name: Upload Security Reports
       uses: actions/upload-artifact@v4
