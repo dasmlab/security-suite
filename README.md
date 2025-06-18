@@ -36,6 +36,16 @@ flowchart TD
 - **Minimal config:** Pass in your app's container name and endpoint, mount code/output, and go!
 
 ---
+### Current Tools Embedded
+
+#### SAST (Static Application Security Testing)
+- **Trivy** – Scans source code for known vulnerabilities, secrets, and misconfigurations.
+- **Semgrep** – Fast, customizable static analysis for code patterns, bugs, and security issues.
+
+#### DAST (Dynamic Application Security Testing)
+- **Nikto** – Lightweight web server scanner for common vulnerabilities, misconfigurations, and insecure files.
+
+---
 
 ## Usage
 
@@ -70,6 +80,14 @@ docker run --rm \
   -e TARGET_ENDPOINT=http://localhost:8080 \
   dasmlab-security-suite:latest
 
+## Local Test Loop
+
+You can run ./test_local.sh to fire up a known container (see the script to set one you like) and to download some source code from a external source as well as the Security Suite container alongside and generate reports.  This generates reports based on whichever tools are enabled / disabled in the Container Suite.
+
+Example Usage
+![image](https://github.com/user-attachments/assets/899b2e85-1d8c-42ff-9f2a-9b839b4e2a35)
+
+
 #Reports
 
-All results are written to /output (or the mounted directory of your choice), and can be uploaded as CI artifacts or reviewed directly.
+All results are written to /output (or the mounted directory of your choice), and can be uploaded as CI artifacts or reviewed directly in CI/CD Pipelines.
