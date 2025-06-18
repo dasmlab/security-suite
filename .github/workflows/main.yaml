@@ -93,12 +93,6 @@ jobs:
         name: security-reports
         path: security_reports/
 
-    - name: Upload Security Reports
-      uses: actions/upload-artifact@v4
-      with:
-        name: security-reports
-        path: security_reports/**
-
     - name: Remove old test_code if exists
       run: rm -rf test_code 
 
