@@ -96,6 +96,17 @@ jobs:
     - name: Remove old test_code if exists
       run: rm -rf test_code 
 
+    - name: Publish Phase
+      run: |
+        docker tag $IMAGE_TAG ghcr.io/dasmlab/security-suite:${VERSION_TAG}
+        docker tag $IMAGE_TAG ghcr.io/dasmlab/security-suite:latest
+        echo "${{ secrets.DASMLAB_GHCR_PAT }}" | docker login ghcr.io -u lmcdasm --password-stdin
+
+        docker push ghcr.io/dasmlab/security-suite-home:${VERSION_TAG}
+        docker push ghcr.io/dasmlab/security-suite-home:latest
+
+
+
     - name: Teardown (Clean Network and Test Container)
       if: always()
       run: |
