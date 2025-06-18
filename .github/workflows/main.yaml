@@ -25,6 +25,7 @@ jobs:
         echo "TARGET_CONTAINER=test-httpd-${GITHUB_SHA::8}" >> $GITHUB_ENV
         echo "HOST_PORT=8888" >> $GITHUB_ENV
         echo "SAST_REPO=https://x-access-token:${GH_PAT}@github.com/lmcdasm/dasmlab_home" >> $GITHUB_ENV
+        echo "SUITE_CONTAINER_NAME=security-suite-instance:$COMMIT_ID"
 
     - name: Print Pipeline Context
       run: |
@@ -34,6 +35,7 @@ jobs:
         echo "Suite Image: $SUITE_IMAGE_TAG"
         echo "Target Image: $TARGET_IMAGE"
         echo "SAST Repo: $SAST_REPO"
+        echo "Security Suite Container Name: $SUITE_CONTAINER_NAME"
 
     - name: Build Phase (Security Suite Container)
       run: |
@@ -63,11 +65,12 @@ jobs:
         mkdir -p security_reports
 
         echo "Run security suite against test target code and web endpoint"
-        docker run --rm \
+        docker run \
           -v ${{ github.workspace }}/target_code:/target_code:ro \
           -v /var/run/docker.sock:/var/run/docker.sock \
           --network $NETWORK_NAME \
           --privileged \
+          --name $SUITE_CONTAINER_NAME
           -e CODE_DIR=/target_code \
           -e TARGET_IMAGE=$TARGET_IMAGE \
           -e TARGET_ENDPOINT="https://dasmlab.org" \
