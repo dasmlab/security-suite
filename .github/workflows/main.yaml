@@ -81,7 +81,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: security-reports
-        path: security_reports/
+        path: security_reports/**
 
     - name: Teardown (Clean Network and Test Container)
       if: always()
