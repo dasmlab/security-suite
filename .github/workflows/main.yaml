@@ -23,6 +23,15 @@ jobs:
         echo "TARGET_CONTAINER=test-httpd-${GITHUB_SHA::8}" >> $GITHUB_ENV
         echo "HOST_PORT=8888" >> $GITHUB_ENV
 
+    - name: Print Pipeline Context
+      run: |
+        echo "Commit: $COMMIT_ID"
+        echo "Tag: $VERSION_TAG"
+        echo "Network: $NETWORK_NAME"
+        echo "Suite Image: $SUITE_IMAGE_TAG"
+        echo "Target: $TARGET_IMAGE"
+
+
     - name: Build Phase (Security Suite Container)
       run: |
         docker build -t $SUITE_IMAGE_TAG .
@@ -70,8 +79,9 @@ jobs:
         name: security-reports
         path: security_reports/
 
-    - name: Teardown (Clean Network)
+    - name: Teardown (Clean Network and Test Container)
       if: always()
       run: |
+        docker rm -f $TARGET_CONTAINER 2>/dev/null || true
         docker network rm $NETWORK_NAME || true
 
