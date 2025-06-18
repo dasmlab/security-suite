@@ -54,6 +54,7 @@ jobs:
         docker run --rm \
           -v ${{ github.workspace }}/test_code:/workspace:ro \
           -v ${{ github.workspace }}/security_reports:/output \
+          -v /var/run/docker.sock:/var/run/docker.sock \
           --network $NETWORK_NAME \
           -e GITHUB_WORKSPACE=/workspace \
           -e CONTAINER_NAME=$TARGET_CONTAINER \
