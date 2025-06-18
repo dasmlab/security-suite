@@ -19,10 +19,10 @@ Reports are automatically generated and exported as build artifacts, making secu
 ```mermaid
 flowchart TD
     A[GitHub Actions / CI Runner] -->|Mount code & output| B(dasmlab_security_suite Container)
-    B --> C[SAST Scan (Trivy, Semgrep)]
-    B --> D[Container Image Scan (Trivy)]
-    B --> E[DAST Scan (Nikto, etc)]
-    C & D & E --> F[Output Reports /output (artifacts)]
+    B --> C[SAST Scan - Trivy, Semgrep]
+    B --> D[Container - Image Scan Trivy]
+    B --> E[DAST Scan - Nikto, etc]
+    C & D & E --> F[Output Reports /output - artifacts]
 ```
 
 ---
