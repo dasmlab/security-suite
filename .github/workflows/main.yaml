@@ -14,6 +14,8 @@ jobs:
 
     - name: Setup Build Metadata
       id: vars
+      env:
+        GH_PAT: ${{ secrets.DASMLAB_GHCR_PAT }}
       run: |
         echo "COMMIT_ID=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
         echo "VERSION_TAG=v$(date +'%Y.%m.%d')-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
@@ -22,7 +24,7 @@ jobs:
         echo "TARGET_IMAGE=httpd:2.4-alpine" >> $GITHUB_ENV
         echo "TARGET_CONTAINER=test-httpd-${GITHUB_SHA::8}" >> $GITHUB_ENV
         echo "HOST_PORT=8888" >> $GITHUB_ENV
-        echo "SAST_REPO=https://$GH_PAT@github.com/lmcdasm/dasmlab-home" >> $GITHUB_ENV
+        echo "SAST_REPO=https://x-access-token:${GH_PAT}@github.com/lmcdasm/dasmlab-home" >> $GITHUB_ENV
 
     - name: Print Pipeline Context
       run: |
@@ -46,13 +48,6 @@ jobs:
         echo "Testing that dasmlab_security_suite container starts..."
         docker run --rm $SUITE_IMAGE_TAG --help || true
         echo "Container started successfully."
-
-    - name: Set up GH PAT for GitHub clone
-      env:
-        GH_PAT: ${{ secrets.DASMLAB_GHCR_PAT }}
-      run: |
-        echo "GH_PAT=$GH_PAT" >> $GITHUB_ENV
-
 
     - name: Test Phase (SAST/DAST Self-Test)
       run: |
