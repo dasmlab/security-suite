@@ -65,7 +65,6 @@ jobs:
         echo "Run security suite against test target code and web endpoint"
         docker run --rm \
           -v ${{ github.workspace }}/target_code:/target_code:ro \
-          -v ${{ github.workspace }}/security_reports:/output \
           -v /var/run/docker.sock:/var/run/docker.sock \
           --network $NETWORK_NAME \
           --privileged \
@@ -76,6 +75,20 @@ jobs:
 
         echo "Teardown test target container"
         docker rm -f $TARGET_CONTAINER 2>/dev/null || true
+
+    - name: Copy Security Reports Out of Container
+      run: |
+        docker cp $SUITE_CONTAINER_NAME:/output ./security_reports
+
+    - name: Remove Security Suite Container
+      run: |
+        docker rm $SUITE_CONTAINER_NAME || true
+
+    - name: Upload Security Reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-reports
+        path: security_reports/
 
     - name: Upload Security Reports
       uses: actions/upload-artifact@v4
