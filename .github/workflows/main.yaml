@@ -102,8 +102,8 @@ jobs:
         docker tag $SUITE_IMAGE_TAG ghcr.io/dasmlab/security-suite:latest
         echo "${{ secrets.DASMLAB_GHCR_PAT }}" | docker login ghcr.io -u lmcdasm --password-stdin
 
-        docker push ghcr.io/dasmlab/security-suite-home:${VERSION_TAG}
-        docker push ghcr.io/dasmlab/security-suite-home:latest
+        docker push ghcr.io/dasmlab/security-suite:${VERSION_TAG}
+        docker push ghcr.io/dasmlab/security-suite:latest
 
 
 
