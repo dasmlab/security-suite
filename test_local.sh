@@ -14,7 +14,7 @@ docker rm -f $CONTAINER_NAME 2>/dev/null || true
 docker run -d --name $CONTAINER_NAME -p $HOST_PORT:80 $TARGET_IMAGE
 
 # 2. Clone the httpd source for SAST (we use a simple git checkout)
-CODE_DIR="test_code"
+CODE_DIR="target_code"
 rm -rf $CODE_DIR
 git clone https://github.com/apache/httpd.git $CODE_DIR || mkdir $CODE_DIR
 

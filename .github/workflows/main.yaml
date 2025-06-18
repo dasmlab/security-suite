@@ -96,6 +96,9 @@ jobs:
         name: security-reports
         path: security_reports/**
 
+    - name: Remove old test_code if exists
+      run: rm -rf test_code 
+
     - name: Teardown (Clean Network and Test Container)
       if: always()
       run: |
