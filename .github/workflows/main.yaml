@@ -25,7 +25,7 @@ jobs:
         echo "TARGET_CONTAINER=test-httpd-${GITHUB_SHA::8}" >> $GITHUB_ENV
         echo "HOST_PORT=8888" >> $GITHUB_ENV
         echo "SAST_REPO=https://x-access-token:${GH_PAT}@github.com/lmcdasm/dasmlab_home" >> $GITHUB_ENV
-        echo "SUITE_CONTAINER_NAME=security-suite-instance:$COMMIT_ID" >> $GITHUB_ENV
+        echo "SUITE_CONTAINER_NAME=security-suite-instance:test" >> $GITHUB_ENV
 
     - name: Print Pipeline Context
       run: |
